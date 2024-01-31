@@ -32,7 +32,7 @@ association list) at [Plutonomicon's repo](https://github.com/Plutonomicon/pluto
 ## Validator Logic
 
 Thanks to Aiken and its easy interface for implementing multi-validators, a
-singly validator can be defined handle both minting and spending of the
+single validator can be defined handle both minting and spending of the
 on-chain list's UTxOs.
 
 By specifying the token names as the identifiers of the linked list elements,

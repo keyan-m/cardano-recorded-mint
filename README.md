@@ -18,7 +18,7 @@ its datum points to some sort of identifier in the possible next element.
 
 This means that injecting a new element requires spending an existing UTxO,
 such that the identifier of the new element is "greater than" the identifier of
-the UTxO getting spent, and also smaller the one that it currently points to.
+the UTxO getting spent, and also smaller than the one it currently points to.
 
 > [!NOTE]
 > The logic for comparing the identifiers depends mostly on the type of the

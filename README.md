@@ -25,6 +25,9 @@ the UTxO getting spent, and also smaller the one that it currently points to.
 > identifiers. Here for example, our identifiers are byte arrays and we're
 > comparing them lexicographically.
 
+You can find a more comprehensive description of an on-chain linked list (or
+association list) at [Plutonomicon's repo](https://github.com/Plutonomicon/plutonomicon/blob/94d615c68eae8efd4c89098a83d9e236ae9171a9/assoc.md).
+
 
 ## Validator Logic
 
@@ -60,7 +63,7 @@ The two high-level requirements are:
   that of the spending UTxO and its datum (i.e. the one it potentially points
   to as its next element)
 
-As an added benefit, this implementation also works nicely with CIP-68: NFTs
+As an added benefit, this implementation also works nicely with [CIP-68](https://github.com/cardano-foundation/CIPs/tree/7687f28447359cd2bdbc945b6acf651906e1583b/CIP-0068): NFTs
 produced at the script address can be intended as the reference tokens
 (label `100`), while users/buyer receive `222` tokens.
 

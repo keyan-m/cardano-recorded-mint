@@ -52,7 +52,7 @@ head of the on-chain list. The main requirements are:
 ### New Mints (or List Injections)
 
 The logic here is primarily handled by the spending endpoint of the
-multi-validator. The minting endpoing only verifies that a single UTxO is
+multi-validator. The minting endpoint only verifies that a single UTxO is
 getting spent from the corresponding script address (therefore ensuring the
 validation of its logic).
 

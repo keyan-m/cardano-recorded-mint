@@ -1,0 +1,14 @@
+name = "keyan-m/cardano-recorded-mint"
+version = "0.0.0"
+license = "Apache-2.0"
+description = "A generic Cardano NFT minting script written in Aiken, with on-chain record of all mints"
+
+[repository]
+user = "keyan-m"
+project = "cardano-recorded-mint"
+platform = "github"
+
+[[dependencies]]
+name = "aiken-lang/stdlib"
+version = "1.7.0"
+source = "github"

@@ -6,6 +6,8 @@ use aiken/transaction.{
 use aiken/transaction/credential.{ScriptCredential}
 use aiken/transaction/value.{AssetName, PolicyId, Value}
 
+const cip67_script_label = #"000643b0"
+const cip67_user_label = #"000de140"
 
 type MintAction {
     Initiate
@@ -97,23 +99,49 @@ validator(utxo_ref: OutputReference) {
     let (beacon_policy, beacon_name, beacon_quantity) =
       beacon_triplet
 
+    // The asset included in the UTxO getting spent must be prefixed with
+    // CIP-67's `100` to ensure that it's never left the script.
+    expect (bytearray.take(beacon_name, 4) == cip67_script_label)?
+
     expect (beacon_policy == own_validator_hash)?
     expect (beacon_quantity == 1)?
 
-    expect [mint_triplet] =
+    // This ordering is presumed to be true due to lexicographically ordering
+    // of assets.
+    expect [script_asset_triplet, user_asset_triplet] =
       mint
         |> value.from_minted_value
         |> value.flatten
 
-    let (mint_policy, mint_name, mint_quantity) =
-      mint_triplet
+    let (script_mint_policy, script_mint_name, script_mint_quantity) =
+      script_asset_triplet
 
-    // New mint must be inserted after provided list element.
-    expect (bytearray.compare(mint_name, beacon_name) == Greater)?
+    let (user_mint_policy, user_mint_name, user_mint_quantity) =
+      user_asset_triplet
 
-    // Exactly 2 assets are allowed to be minted: one for the validator, one
-    // for the user/buyer.
-    expect (mint_quantity == 2)?
+    // Only mints of this validator are allowed.
+    expect (script_mint_policy == own_validator_hash)?
+    expect (user_mint_policy == own_validator_hash)?
+
+    // CIP-67 labeling must be upheld to prevent spoofing of the on-chain list.
+    let script_asset_label = bytearray.take(script_mint_name, 4)
+    expect (script_asset_label == cip67_script_label)?
+    let user_asset_label = bytearray.take(user_mint_name, 4)
+    expect (user_asset_label == cip67_user_label)?
+
+    // Apart from their labels, script and user assets must have equal token
+    // names.
+    let script_asset_name = bytearray.drop(script_mint_name, 4)
+    let user_asset_name = bytearray.drop(user_mint_name, 4)
+    expect (script_asset_name == user_asset_name)?
+
+    // Exactly 1 of each assets are allowed to be minted.
+    expect (script_mint_quantity == 1)?
+    expect (user_mint_quantity == 1)?
+
+    // New mint must be inserted after provided list element (no need to
+    // separate labels and names here).
+    expect (bytearray.compare(script_mint_name, beacon_name) == Greater)?
 
     // New mint's token name must be lexicographically smaller than the
     // potential next element.
@@ -123,7 +151,7 @@ validator(utxo_ref: OutputReference) {
           True
         }
         Some(next) -> {
-          (bytearray.compare(mint_name, next) == Less)?
+          (bytearray.compare(script_mint_name, next) == Less)?
         }
       }
 
@@ -145,7 +173,7 @@ validator(utxo_ref: OutputReference) {
     let v0_triplet = get_single_asset_from_value(v0)
     expect (v0_triplet == beacon_triplet)?
     expect Some(new_next): Datum = d0
-    expect (new_next == mint_name)?
+    expect (new_next == script_mint_name)?
 
     // New list element is going to sit between the UTxO that is getting spent,
     // and the (possible) subsequent element. Therefore, the new element must
@@ -156,8 +184,8 @@ validator(utxo_ref: OutputReference) {
     // Only 1 of the 2 minted tokens must be sent to the script. The other is
     // free to be sent anywhere else.
     let (p1, t1, q1) = get_single_asset_from_value(v1)
-    expect (p1 == mint_policy)?
-    expect (t1 == mint_name)?
+    expect (p1 == own_validator_hash)?
+    expect (t1 == script_mint_name)?
     expect (q1 == 1)?
 
     order_is_valid?

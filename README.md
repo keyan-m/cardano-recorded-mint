@@ -32,7 +32,7 @@ association list) at [Plutonomicon's repo](https://github.com/Plutonomicon/pluto
 ## Validator Logic
 
 Thanks to Aiken and its easy interface for implementing multi-validators, a
-single validator can be defined handle both minting and spending of the
+single validator can be defined to handle both minting and spending of the
 on-chain list's UTxOs.
 
 By specifying the token names as the identifiers of the linked list elements,
@@ -65,7 +65,7 @@ The two high-level requirements are:
 
 As an added benefit, this implementation also works nicely with [CIP-68](https://github.com/cardano-foundation/CIPs/tree/7687f28447359cd2bdbc945b6acf651906e1583b/CIP-0068): NFTs
 produced at the script address can be intended as the reference tokens
-(label `100`), while users/buyer receive `222` tokens.
+(label `100`), while users/buyers receive `222` tokens.
 
 
 ## Disclaimer

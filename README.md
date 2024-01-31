@@ -20,6 +20,11 @@ This means that injecting a new element requires spending an existing UTxO,
 such that the identifier of the new element is "greater than" the identifier of
 the UTxO getting spent, and also smaller the one that it currently points to.
 
+> [!NOTE]
+> The logic for comparing the identifiers depends mostly on the type of the
+> identifiers. Here for example, our identifiers are byte arrays and we're
+> comparing them lexicographically.
+
 
 ## Validator Logic
 

@@ -73,7 +73,28 @@ validator(utxo_ref: OutputReference) {
           )
 
         // Only 2 assets are allowed to be minted.
-        (mint_quantity == 2)?
+        expect (mint_quantity == 2)?
+
+        // List element UTxO must be authentic.
+        expect (beacon_policy, beacon_name, beacon_quantity) =
+          get_single_asset_from_value(list_elem_value)
+
+        expect (beacon_policy == own_policy)?
+        expect (beacon_quantity == 1)?
+
+        // New mint must be inserted after provided list element.
+        expect (mint_name > beacon_name)?
+
+        expect maybe_next: Datum = list_elem_datum
+
+        when maybe_next is {
+          None -> {
+            True
+          }
+          Some(next) -> {
+            (mint_name < next)?
+          }
+        }
       }
     }
   }

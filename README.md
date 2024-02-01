@@ -68,7 +68,7 @@ The high-level requirements are:
   to as its next element)
 
 As an added benefit, this implementation also works nicely with [CIP-68](https://github.com/cardano-foundation/CIPs/tree/7687f28447359cd2bdbc945b6acf651906e1583b/CIP-0068): NFTs
-produced at the script address are already forced to have the reference tokens
+produced at the script address are already forced to have the reference token's
 label `(100)`, while users/buyers can receive `(222)` tokens.
 
 

@@ -6,8 +6,7 @@ use aiken/transaction.{
 use aiken/transaction/credential.{ScriptCredential}
 use aiken/transaction/value.{AssetName, PolicyId, Value}
 
-const cip67_script_label = #"000643b0"
-const cip67_user_label = #"000de140"
+const cip67_ref_label = #"000643b0"
 
 type MintAction {
     Initiate
@@ -101,17 +100,20 @@ validator(utxo_ref: OutputReference) {
 
     // The asset included in the UTxO getting spent must be prefixed with
     // CIP-67's `100` to ensure that it's never left the script.
-    expect (bytearray.take(beacon_name, 4) == cip67_script_label)?
+    expect (bytearray.take(beacon_name, 4) == cip67_ref_label)?
 
     expect (beacon_policy == own_validator_hash)?
     expect (beacon_quantity == 1)?
 
-    // This ordering is presumed to be true due to lexicographically ordering
-    // of assets.
-    expect [script_asset_triplet, user_asset_triplet] =
+    expect [triplet0, triplet1] =
       mint
         |> value.from_minted_value
         |> value.flatten
+
+    // Distinguishes the asset triplet with CIP-67 reference label (100), and
+    // also ensures the other triplet's token name does not start with `100`.
+    let (script_asset_triplet, user_asset_triplet) =
+      validate_mint_labels(triplet0, triplet1)
 
     let (script_mint_policy, script_mint_name, script_mint_quantity) =
       script_asset_triplet
@@ -123,14 +125,9 @@ validator(utxo_ref: OutputReference) {
     expect (script_mint_policy == own_validator_hash)?
     expect (user_mint_policy == own_validator_hash)?
 
-    // CIP-67 labeling must be upheld to prevent spoofing of the on-chain list.
-    let script_asset_label = bytearray.take(script_mint_name, 4)
-    expect (script_asset_label == cip67_script_label)?
-    let user_asset_label = bytearray.take(user_mint_name, 4)
-    expect (user_asset_label == cip67_user_label)?
-
     // Apart from their labels, script and user assets must have equal token
-    // names.
+    // names (user asset must have an arbitrary, 4 byte-long label other than
+    // CIP-67's `100`).
     let script_asset_name = bytearray.drop(script_mint_name, 4)
     let user_asset_name = bytearray.drop(user_mint_name, 4)
     expect (script_asset_name == user_asset_name)?
@@ -213,5 +210,25 @@ fn resolve_output_reference(
     input.output
   } else {
     resolve_output_reference(inputs, output_ref)
+  }
+}
+
+fn validate_mint_labels(
+  triplet0: (PolicyId, AssetName, Int),
+  triplet1: (PolicyId, AssetName, Int)
+) -> ((PolicyId, AssetName, Int), (PolicyId, AssetName, Int)) {
+  let (_, t0, _) = triplet0
+  let (_, t1, _) = triplet1
+  let l0 = bytearray.take(t0, 4)
+  let l1 = bytearray.take(t1, 4)
+  let l0IsCip67 = l0 == cip67_ref_label
+  let l1IsCip67 = l1 == cip67_ref_label
+  if l0IsCip67 && !l1IsCip67 {
+    (triplet0, triplet1)
+  } else if !l0IsCip67 && l1IsCip67 {
+    (triplet1, triplet0)
+  } else {
+    // Exactly one of the two mints must be prefixed with CIP-67 `100`
+    error
   }
 }

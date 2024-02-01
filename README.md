@@ -59,13 +59,17 @@ validation of its logic).
 The two high-level requirements are:
 - Only 2 of the specified asset are getting minted: one to be included in the
   list UTxO (to prove authenticity), and one to be sent freely anywhere else
+- Token name of the asset being sent to the script must comply with [CIP-67](https://github.com/cardano-foundation/CIPs/tree/7687f28447359cd2bdbc945b6acf651906e1583b/CIP-0067)'s `(100)`, while
+  the user's token name must have any other 4 byte-long label.
+- Apart from their CIP-67 labels, the two assets must share the same token
+  name.
 - The token name of the newly minted asset is lexicographically placed between
   that of the spending UTxO and its datum (i.e. the one it potentially points
   to as its next element)
 
 As an added benefit, this implementation also works nicely with [CIP-68](https://github.com/cardano-foundation/CIPs/tree/7687f28447359cd2bdbc945b6acf651906e1583b/CIP-0068): NFTs
-produced at the script address can be intended as the reference tokens
-(label `100`), while users/buyers receive `222` tokens.
+produced at the script address are already forced to have the reference tokens
+label `(100)`, while users/buyers can receive `(222)` tokens.
 
 
 ## Disclaimer

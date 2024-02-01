@@ -56,7 +56,7 @@ multi-validator. The minting endpoint only verifies that a single UTxO is
 getting spent from the corresponding script address (therefore ensuring the
 validation of its logic).
 
-The two high-level requirements are:
+The high-level requirements are:
 - Only 2 of the specified asset are getting minted: one to be included in the
   list UTxO (to prove authenticity), and one to be sent freely anywhere else
 - Token name of the asset being sent to the script must comply with [CIP-67](https://github.com/cardano-foundation/CIPs/tree/7687f28447359cd2bdbc945b6acf651906e1583b/CIP-0067)'s `(100)`, while

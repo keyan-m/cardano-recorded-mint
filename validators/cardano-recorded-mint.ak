@@ -101,8 +101,10 @@ validator(utxo_ref: OutputReference) {
     let (beacon_policy, beacon_name, beacon_quantity) = beacon_triplet
 
     // The asset included in the UTxO getting spent must be prefixed with
-    // CIP-67's `100` to ensure that it's never left the script.
-    expect (bytearray.take(beacon_name, 4) == cip67_ref_label)?
+    // CIP-67's `100` to ensure that it's never left the script. Or check that
+    // the beacon is from list's head.
+    expect
+      (bytearray.take(beacon_name, 4) == cip67_ref_label || beacon_name == "")?
 
     expect (beacon_policy == own_validator_hash)?
     expect (beacon_quantity == 1)?

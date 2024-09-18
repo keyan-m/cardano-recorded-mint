@@ -79,11 +79,13 @@ validator recorded_mint(utxo_ref: OutputReference) {
   }
 
   spend(
-    datum: Datum,
+    option_datum: Option<Datum>,
     _redeemer: Void,
     own_ref: OutputReference,
     tx: Transaction,
   ) {
+    expect Some(datum) = option_datum
+
     let Transaction { inputs, outputs, mint, .. } = tx
 
     let Output { address: own_addr, value: own_value, .. } =

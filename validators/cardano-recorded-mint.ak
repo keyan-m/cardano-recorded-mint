@@ -1,35 +1,30 @@
-use aiken/bytearray
-use aiken/list
-use aiken/transaction.{
-  InlineDatum, Input, Mint, Output, OutputReference, ScriptContext, Spend,
-  Transaction,
+use aiken/collection/list
+use aiken/primitive/bytearray
+use cardano/address.{Script}
+use cardano/assets.{AssetName, PolicyId}
+use cardano/transaction.{
+  InlineDatum, Input, Output, OutputReference, Transaction,
 }
-use aiken/transaction/credential.{ScriptCredential}
-use aiken/transaction/value.{AssetName, PolicyId, Value}
-use fortuna/utils.{resolve_output_reference}
+use recorded_mint/utils.{
+  cip67_ref_label, get_single_asset_from_value, resolve_output_reference,
+  validate_mint_labels,
+}
 
-const cip67_ref_label = #"000643b0"
-
-type MintAction {
+pub type MintAction {
   Initiate
   NewMint
 }
 
-type Datum =
+pub type Datum =
   Option<AssetName>
 
-validator(utxo_ref: OutputReference) {
-  fn mint(action: MintAction, ctx: ScriptContext) -> Bool {
-    let ScriptContext { transaction: tx, purpose } = ctx
-
-    expect Mint(own_policy) = purpose
-
+validator recorded_mint(utxo_ref: OutputReference) {
+  mint(action: MintAction, own_policy: PolicyId, tx: Transaction) {
     let Transaction { inputs, outputs, mint, .. } = tx
 
     expect [mint_triplet] =
       mint
-        |> value.from_minted_value
-        |> value.flatten
+        |> assets.flatten
 
     let (mint_policy, mint_name, mint_quantity) = mint_triplet
 
@@ -56,7 +51,7 @@ validator(utxo_ref: OutputReference) {
           list.filter(
             outputs,
             fn(output) {
-              output.address.payment_credential == ScriptCredential(own_policy)
+              output.address.payment_credential == Script(own_policy)
             },
           )
 
@@ -75,9 +70,7 @@ validator(utxo_ref: OutputReference) {
           list.filter(
             inputs,
             fn(input) {
-              input.output.address.payment_credential == ScriptCredential(
-                own_policy,
-              )
+              input.output.address.payment_credential == Script(own_policy)
             },
           )
         True
@@ -85,15 +78,18 @@ validator(utxo_ref: OutputReference) {
     }
   }
 
-  fn spend(datum: Datum, _redeemer: Void, ctx: ScriptContext) -> Bool {
-    expect ScriptContext { transaction: tx, purpose: Spend(own_ref) } = ctx
-
+  spend(
+    datum: Datum,
+    _redeemer: Void,
+    own_ref: OutputReference,
+    tx: Transaction,
+  ) {
     let Transaction { inputs, outputs, mint, .. } = tx
 
     let Output { address: own_addr, value: own_value, .. } =
       resolve_output_reference(inputs, own_ref)
 
-    expect ScriptCredential(own_validator_hash) = own_addr.payment_credential
+    expect Script(own_validator_hash) = own_addr.payment_credential
 
     let beacon_triplet = get_single_asset_from_value(own_value)
 
@@ -109,10 +105,10 @@ validator(utxo_ref: OutputReference) {
     expect (beacon_policy == own_validator_hash)?
     expect (beacon_quantity == 1)?
 
-    expect [triplet0, triplet1] =
+    expect [triplet0,
+      triplet1] =
       mint
-        |> value.from_minted_value
-        |> value.flatten
+        |> assets.flatten
 
     // Distinguishes the asset triplet with CIP-67 reference label (100), and
     // also ensures the other triplet's token name does not start with `100`.
@@ -153,13 +149,12 @@ validator(utxo_ref: OutputReference) {
       }
 
     // Exactly 2 outputs are expected to be produced at the script.
-    expect [o0, o1] =
+    expect [o0,
+      o1] =
       list.filter(
         outputs,
         fn(output) {
-          output.address.payment_credential == ScriptCredential(
-            own_validator_hash,
-          )
+          output.address.payment_credential == Script(own_validator_hash)
         },
       )
 
@@ -189,31 +184,8 @@ validator(utxo_ref: OutputReference) {
 
     order_is_valid?
   }
-}
 
-fn get_single_asset_from_value(v: Value) -> (PolicyId, AssetName, Int) {
-  // A single asset was expected.
-  expect [triplet] =
-    v
-      |> value.without_lovelace
-      |> value.flatten
-  triplet
-}
-
-fn validate_mint_labels(
-  triplet0: (PolicyId, AssetName, Int),
-  triplet1: (PolicyId, AssetName, Int),
-) -> ((PolicyId, AssetName, Int), (PolicyId, AssetName, Int)) {
-  let (_, t0, _) = triplet0
-  let (_, t1, _) = triplet1
-  let l0IsCip67 = bytearray.take(t0, 4) == cip67_ref_label
-  let l1IsCip67 = bytearray.take(t1, 4) == cip67_ref_label
-  if l0IsCip67 && !l1IsCip67 {
-    (triplet0, triplet1)
-  } else if !l0IsCip67 && l1IsCip67 {
-    (triplet1, triplet0)
-  } else {
-    // Exactly one of the two mints must be prefixed with CIP-67 `100`
+  else(_) {
     fail
   }
 }

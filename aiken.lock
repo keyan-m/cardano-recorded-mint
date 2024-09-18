@@ -3,23 +3,12 @@
 
 [[requirements]]
 name = "aiken-lang/stdlib"
-version = "1.7.0"
-source = "github"
-
-[[requirements]]
-name = "aiken-lang/fortuna"
-version = "d2e5831f92b1b596bb2cc1ab801509da28650fcc"
+version = "2.0.0"
 source = "github"
 
 [[packages]]
 name = "aiken-lang/stdlib"
-version = "1.7.0"
-requirements = []
-source = "github"
-
-[[packages]]
-name = "aiken-lang/fortuna"
-version = "d2e5831f92b1b596bb2cc1ab801509da28650fcc"
+version = "2.0.0"
 requirements = []
 source = "github"
 

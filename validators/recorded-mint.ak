@@ -12,7 +12,7 @@ use recorded_mint/utils.{
 
 pub type MintAction {
   Initiate
-  NewMint
+  NewUser
 }
 
 pub type Datum =
@@ -55,7 +55,7 @@ validator recorded_mint(utxo_ref: OutputReference) {
         )
           |> linked_list.run_root_with(root_asset_name)
       }
-      NewMint -> {
+      NewUser -> {
         // A single UTxO must be getting spent from the spending endpoint.
         expect [anchor_element_input] =
           list.filter(

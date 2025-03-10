@@ -3,13 +3,25 @@
 
 [[requirements]]
 name = "aiken-lang/stdlib"
-version = "v2.0.0"
+version = "v2.2.0"
+source = "github"
+
+[[requirements]]
+name = "anastasia-labs/aiken-design-patterns"
+version = "develop"
 source = "github"
 
 [[packages]]
 name = "aiken-lang/stdlib"
-version = "v2.0.0"
+version = "v2.2.0"
+requirements = []
+source = "github"
+
+[[packages]]
+name = "anastasia-labs/aiken-design-patterns"
+version = "develop"
 requirements = []
 source = "github"
 
 [etags]
+"anastasia-labs/aiken-design-patterns@develop" = [{ secs_since_epoch = 1741603093, nanos_since_epoch = 547901372 }, "5e4e5b41cb99ead0eb9a44c5816a7fba8ddcdbf55b755a935fba33d7918fdc21"]

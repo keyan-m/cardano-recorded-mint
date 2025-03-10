@@ -1,5 +1,6 @@
 name = "keyan-m/cardano-recorded-mint"
-version = "0.1.0"
+version = "0.2.0"
+compiler = "v1.1.9"
 plutus = "v3"
 license = "Apache-2.0"
 description = "A generic Cardano NFT minting script written in Aiken, with on-chain record of all mints"
@@ -13,3 +14,20 @@ platform = "github"
 name = "aiken-lang/stdlib"
 version = "v2.2.0"
 source = "github"
+
+[[dependencies]]
+name = "aiken-lang/fuzz"
+version = "2.1.0"
+source = "github"
+
+[[dependencies]]
+name = "keyan-m/aiken-scott-utils"
+version = "v1.3.0"
+source = "github"
+
+[[dependencies]]
+name = "anastasia-labs/aiken-design-patterns"
+version = "e1bf167"
+source = "github"
+
+[config]

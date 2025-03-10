@@ -13,7 +13,7 @@ use recorded_mint/utils.{
 
 pub type MintAction {
   Initiate
-  NewUser
+  NewMint
 }
 
 pub type Datum =
@@ -54,7 +54,7 @@ validator recorded_mint(utxo_ref: OutputReference) {
         )
           |> linked_list.run_root_with(root_asset_name)
       }
-      NewUser -> {
+      NewMint -> {
         // A single UTxO must be getting spent from the spending endpoint.
         expect [anchor_element_input] =
           list.filter(
@@ -127,7 +127,7 @@ validator recorded_mint(utxo_ref: OutputReference) {
     } = resolve_output_reference(inputs, own_ref)
 
     // The only mint endpoint that allows two assets to be minted is the
-    // `NewUser` redeemer.
+    // `NewMint` redeemer.
     ( mint |> assets.tokens(own_validator_hash) |> dict.size ) == 2
   }
 

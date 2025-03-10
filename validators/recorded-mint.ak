@@ -8,6 +8,7 @@ use cardano/assets.{AssetName, PolicyId}
 use cardano/transaction.{Input, Output, OutputReference, Transaction}
 use recorded_mint/utils.{
   cip67_ref_label, cip67_user_label, label_length, resolve_output_reference,
+  root_asset_name,
 }
 
 pub type MintAction {
@@ -17,8 +18,6 @@ pub type MintAction {
 
 pub type Datum =
   Option<AssetName>
-
-pub const root_asset_name = #""
 
 validator recorded_mint(utxo_ref: OutputReference) {
   mint(action: MintAction, own_policy: PolicyId, tx: Transaction) {

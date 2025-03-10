@@ -92,7 +92,7 @@ validator recorded_mint(utxo_ref: OutputReference) {
             // to the script, except the label is `222`.
             let new_user_nft_name =
               cip67_user_label
-                |> bytearray.concat(bytearray.drop(new_asset_name, 4))
+                |> bytearray.concat(bytearray.drop(new_asset_name, label_length))
 
             // Mint quantity of this user NFT.
             let user_nft_mint_qty =

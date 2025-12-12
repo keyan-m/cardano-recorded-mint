@@ -33,7 +33,6 @@ validator recorded_mint(utxo_ref: OutputReference) {
               output.address.payment_credential == Script(own_policy)
             },
           )
-
         linked_list.init(
           // To enforce a single initiation, the specified UTxO must be spent.
           nonce_validated: list.any(
@@ -41,16 +40,16 @@ validator recorded_mint(utxo_ref: OutputReference) {
             fn(input) { input.output_reference == utxo_ref },
           ),
           produced_element_output: list_head_output,
-          destination_address_validator: fn(_dest: Address) -> Bool {
+          list_nft_policy_id: own_policy,
+          tx_mint: mint,
+          destination_address_and_root_data_validator: fn(
+            _dest: Address,
+            underlying_data: Data,
+          ) -> Bool {
             // Address of the produced UTxO is already validated through the
             // filter function.
-            True
-          },
-          list_nft_policy_id: own_policy,
-          root_data_validator: fn(underlying_data: Data) -> Bool {
             builtin.un_b_data(underlying_data) == #""
           },
-          tx_mint: mint,
         )
           |> linked_list.run_root_with(root_asset_name)
       }
@@ -79,6 +78,7 @@ validator recorded_mint(utxo_ref: OutputReference) {
           anchor_element_input: anchor_element_input,
           continued_anchor_element_output: continued_anchor_element_output,
           new_element_output: new_element_output,
+          tx_mint: mint,
           additional_validations: fn(
             _anchor_out_ref: OutputReference,
             _anchor_is_root: Bool,
@@ -92,7 +92,9 @@ validator recorded_mint(utxo_ref: OutputReference) {
             // to the script, except the label is `222`.
             let new_user_nft_name =
               cip67_user_label
-                |> bytearray.concat(bytearray.drop(new_asset_name, label_length))
+                |> bytearray.concat(
+                    bytearray.drop(new_asset_name, label_length),
+                  )
 
             // Mint quantity of this user NFT.
             let user_nft_mint_qty =
@@ -102,7 +104,6 @@ validator recorded_mint(utxo_ref: OutputReference) {
             // One must be minted.
             user_nft_mint_qty == 1
           },
-          tx_mint: mint,
         )
           |> linked_list.run_eval_with(
               root_asset_name,

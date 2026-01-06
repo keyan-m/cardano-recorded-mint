@@ -42,9 +42,7 @@ validator recorded_mint(utxo_ref: OutputReference) {
           produced_element_output: list_head_output,
           list_nft_policy_id: own_policy,
           tx_mint: mint,
-          root_data_validator: fn(
-            underlying_data: Data,
-          ) -> Bool {
+          root_data_validator: fn(underlying_data: Data) -> Bool {
             builtin.un_b_data(underlying_data) == #""
           },
         )

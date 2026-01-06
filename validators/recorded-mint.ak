@@ -42,12 +42,9 @@ validator recorded_mint(utxo_ref: OutputReference) {
           produced_element_output: list_head_output,
           list_nft_policy_id: own_policy,
           tx_mint: mint,
-          destination_address_and_root_data_validator: fn(
-            _dest: Address,
+          root_data_validator: fn(
             underlying_data: Data,
           ) -> Bool {
-            // Address of the produced UTxO is already validated through the
-            // filter function.
             builtin.un_b_data(underlying_data) == #""
           },
         )
@@ -80,9 +77,8 @@ validator recorded_mint(utxo_ref: OutputReference) {
           new_element_output: new_element_output,
           tx_mint: mint,
           additional_validations: fn(
-            _anchor_out_ref: OutputReference,
-            _anchor_is_root: Bool,
             _anchor_asset_name: Key,
+            _anchor_is_root: Bool,
             _anchor_data: Data,
             new_asset_name: Key,
             _new_data: Data,
